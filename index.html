@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>提案事例 - タブデザイン改善</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+
+  .slide {
+    width: 1280px;
+    height: 720px;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,.12);
+  }
+
+  /* --- Header --- */
+  .header {
+    background: #3d3226;
+    color: #fff;
+    padding: 18px 48px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .header-label {
+    background: #c8a84e;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 3px;
+    letter-spacing: .08em;
+  }
+  .header-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: .06em;
+  }
+
+  /* --- Main content area --- */
+  .content {
+    display: flex;
+    height: calc(100% - 62px);
+  }
+
+  /* --- Before / After columns --- */
+  .col {
+    flex: 1;
+    padding: 28px 32px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .col-before {
+    background: #f7f5f0;
+    border-right: 1px solid #e0dcd5;
+  }
+  .col-after {
+    background: #fff;
+  }
+
+  .col-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .15em;
+    color: #999;
+    margin-bottom: 6px;
+  }
+  .col-label-before { color: #b0a090; }
+  .col-label-after { color: #c8a84e; }
+
+  .col-heading {
+    font-size: 17px;
+    font-weight: 700;
+    color: #3d3226;
+    margin-bottom: 16px;
+    text-align: center;
+    line-height: 1.5;
+  }
+  .col-heading .highlight {
+    color: #c8a84e;
+    font-weight: 900;
+  }
+  .col-heading .problem {
+    color: #c04040;
+    font-weight: 900;
+  }
+
+  /* --- Tab cards --- */
+  .tabs-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    margin-bottom: 14px;
+  }
+
+  .tab-card {
+    width: 130px;
+    height: 110px;
+    border: 3.5px solid #4a3c2e;
+    border-radius: 4px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all .3s;
+  }
+  .tab-card.type-a {
+    background: #f5efd8;
+  }
+  .tab-card.type-b-light {
+    background: #f5efd8;
+  }
+  .tab-card.type-b {
+    background: #3d3226;
+  }
+  .tab-card.type-b-dimmed {
+    background: #3d3226;
+    opacity: .55;
+  }
+
+  /* Hook (hanger) */
+  .tab-hook {
+    position: absolute;
+    top: -22px;
+    left: 14px;
+    width: 20px;
+    height: 22px;
+  }
+  .tab-hook-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3.5px;
+    height: 22px;
+    background: #4a3c2e;
+  }
+  .tab-hook-curve {
+    position: absolute;
+    left: 3px;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    border: 3px solid #4a3c2e;
+    border-radius: 0 50% 0 0;
+    border-left: none;
+    border-bottom: none;
+  }
+
+  /* Door open indicator - a subtle curved line at top-left */
+  .door-open {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 28px;
+    height: 28px;
+    border-bottom-right-radius: 100%;
+    border: 2.5px solid #4a3c2e;
+    border-top: none;
+    border-left: none;
+    background: transparent;
+  }
+  .tab-card.type-b .door-open,
+  .tab-card.type-b-dimmed .door-open {
+    border-color: #6b5d4e;
+  }
+
+  /* Door closed - no indicator, the tab-card border at top-left stays flat */
+  .door-closed-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 2px;
+  }
+
+  .tab-eq {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .35em;
+    color: #5a4a3a;
+    margin-bottom: 2px;
+  }
+  .tab-card.type-b .tab-eq,
+  .tab-card.type-b-dimmed .tab-eq {
+    color: #a09080;
+  }
+  .tab-type {
+    font-size: 14px;
+    font-weight: 900;
+    color: #4a3c2e;
+    letter-spacing: .08em;
+  }
+  .tab-card.type-b .tab-type,
+  .tab-card.type-b-dimmed .tab-type {
+    color: #b0a090;
+  }
+  .tab-letter {
+    font-size: 36px;
+    font-weight: 900;
+    color: #4a3c2e;
+    line-height: 1;
+  }
+  .tab-card.type-b .tab-letter,
+  .tab-card.type-b-dimmed .tab-letter {
+    color: #8a7a68;
+  }
+
+  /* Arrow between before/after */
+  .arrow {
+    position: absolute;
+    left: 50%;
+    top: 45%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    width: 44px;
+    height: 44px;
+    background: #c8a84e;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .arrow svg {
+    width: 22px;
+    height: 22px;
+    fill: #fff;
+  }
+
+  /* Problem/Solution annotation */
+  .annotation {
+    font-size: 13px;
+    color: #888;
+    text-align: center;
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+  .annotation strong {
+    color: #c04040;
+    font-weight: 700;
+  }
+  .annotation .good {
+    color: #c8a84e;
+    font-weight: 700;
+  }
+
+  /* Client voice section */
+  .client-voice {
+    margin-top: auto;
+    width: 100%;
+    background: #f7f9fb;
+    border-radius: 10px;
+    padding: 14px 16px;
+    border: 1px solid #e4eaf0;
+    position: relative;
+  }
+  .client-voice::before {
+    content: '\201C';
+    position: absolute;
+    top: -6px;
+    left: 12px;
+    font-size: 40px;
+    color: #b8cce0;
+    font-family: Georgia, serif;
+    line-height: 1;
+  }
+
+  .cv-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .cv-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e0eff8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .cv-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #555;
+  }
+  .cv-date {
+    font-size: 11px;
+    color: #aaa;
+  }
+
+  .cv-body {
+    font-size: 13px;
+    color: #444;
+    line-height: 1.7;
+    padding-left: 12px;
+    border-left: 3px solid #b8cce0;
+  }
+  .cv-body .emphasis {
+    font-weight: 700;
+    color: #3a7cc0;
+  }
+
+  /* Question mark icon */
+  .question-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #e8d5b8;
+    color: #8a6d3b;
+    font-weight: 900;
+    font-size: 15px;
+    border-radius: 50%;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  /* Status bar on tabs */
+  .tab-status {
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    padding: 2px 12px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+  .tab-status.on {
+    background: #c8a84e;
+    color: #fff;
+  }
+  .tab-status.off {
+    background: #d8d3cb;
+    color: #8a8078;
+  }
+
+  /* Dimming overlay for after-off */
+  .dim-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.25);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  /* Improvements list */
+  .improvements {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .improvement-tag {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: #f0e8d4;
+    color: #8a6d3b;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="slide">
+  <!-- Header -->
+  <div class="header">
+    <span class="header-label">提案事例</span>
+    <span class="header-title">タブ切り替えUI ── 実装時の改善提案</span>
+  </div>
+
+  <!-- Arrow -->
+  <div class="arrow">
+    <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/><path d="M5 12h14" stroke="#fff" stroke-width="2.2" fill="none"/><path d="M13 6l6 6-6 6" stroke="#fff" stroke-width="2.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>
+  </div>
+
+  <div class="content">
+    <!-- Before -->
+    <div class="col col-before">
+      <div class="col-label col-label-before">BEFORE</div>
+      <div class="col-heading">デザインデータのまま<span class="question-icon">?</span></div>
+
+      <div class="tabs-row">
+        <!-- Type A - door open -->
+        <div style="position:relative;">
+          <div class="tab-card type-a">
+            <div class="tab-hook"><div class="tab-hook-bar"></div><div class="tab-hook-curve"></div></div>
+            <div class="door-open"></div>
+            <span class="tab-eq">EQUIPMENT</span>
+            <span class="tab-type">TYPE</span>
+            <span class="tab-letter">A</span>
+            <div class="tab-status on">ON</div>
+          </div>
+        </div>
+
+        <!-- Type B - door open (same as A visually) -->
+        <div style="position:relative;">
+          <div class="tab-card type-b">
+            <div class="tab-hook"><div class="tab-hook-bar"></div><div class="tab-hook-curve"></div></div>
+            <div class="door-open"></div>
+            <span class="tab-eq">EQUIPMENT</span>
+            <span class="tab-type">TYPE</span>
+            <span class="tab-letter">B</span>
+            <div class="tab-status off">OFF</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="annotation" style="margin-top: 28px;">
+        両方とも扉が開いた状態<br>
+        <strong>どちらが選択中か分かりにくい</strong>
+      </p>
+    </div>
+
+    <!-- After -->
+    <div class="col col-after">
+      <div class="col-label col-label-after">AFTER</div>
+      <div class="col-heading"><span class="highlight">実装時に改善提案</span></div>
+
+      <div class="tabs-row">
+        <!-- Type A - door open (active) -->
+        <div style="position:relative;">
+          <div class="tab-card type-a">
+            <div class="tab-hook"><div class="tab-hook-bar"></div><div class="tab-hook-curve"></div></div>
+            <div class="door-open"></div>
+            <span class="tab-eq">EQUIPMENT</span>
+            <span class="tab-type">TYPE</span>
+            <span class="tab-letter">A</span>
+            <div class="tab-status on">ON</div>
+          </div>
+        </div>
+
+        <!-- Type B - door CLOSED + dimmed (inactive) -->
+        <div style="position:relative;">
+          <div class="tab-card type-b">
+            <div class="tab-hook"><div class="tab-hook-bar"></div><div class="tab-hook-curve"></div></div>
+            <!-- No door-open element = door closed -->
+            <span class="tab-eq">EQUIPMENT</span>
+            <span class="tab-type">TYPE</span>
+            <span class="tab-letter">B</span>
+            <div class="dim-overlay"></div>
+            <div class="tab-status off">OFF</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="improvements" style="margin-top:28px;">
+        <span class="improvement-tag">扉を閉じる</span>
+        <span class="improvement-tag">CSSで暗く</span>
+      </div>
+
+      <p class="annotation" style="margin-top: 8px;">
+        <span class="good">ON / OFF が一目瞭然</span>
+      </p>
+
+      <!-- Client feedback -->
+      <div class="client-voice">
+        <div class="cv-header">
+          <div class="cv-avatar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#7baed0"><circle cx="12" cy="8" r="5"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+          </div>
+          <div>
+            <span class="cv-name">菊地友貴</span>
+            <span class="cv-date">2026年4月10日 06:57</span>
+          </div>
+        </div>
+        <div class="cv-body">
+          OFFの方は扉を閉じてみました<br>
+          <span class="emphasis">こういうご提案とてもありがたいです！</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
