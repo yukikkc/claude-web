@@ -59,6 +59,9 @@ description: ブログ「Live Freely」（live-freely-22.com）の記事を執�
 3. 冒頭にタイトル（H1）、その下に本文
 4. **必ずWordPress貼り付け用のHTML版 `articles/<slug>.html` も同時に作る**（ブログはWordPressで、Markdownをそのまま貼ると `#` や `**` が記号のまま残ってしまうため）
    - 使うタグは `<h2>` `<h3>` `<p>` `<strong>` `<ul>` `<ol>` `<li>` `<table>` `<blockquote>` `<a>` `<small>` のみ。`<h1>` は使わない
+   - **テーマはSWELL**。装飾したいリストはGutenbergブロックコメント付きで書くと、貼り付け時にSWELLのネイティブブロックになる：
+     `<!-- wp:list {"className":"is-style-check_list"} --><ul class="wp-block-list is-style-check_list">` ＋ 各`<li>`を`<!-- wp:list-item -->`〜`<!-- /wp:list-item -->`で包み、`</ul>`の後に`<!-- /wp:list -->`
+     SWELLのリストスタイル: `is-style-check_list`（チェック）/ `is-style-good_list` / `is-style-bad_list` / `is-style-num_circle`（丸数字）/ `is-style-index`（目次風）。注意点リストにはcheck_listを使う
    - タイトルはWordPressのタイトル欄に貼る用として、ファイル先頭にHTMLコメントで置く
    - 貼り方：ブロックエディタなら右上「︙」→「コードエディター」に貼ってから「ビジュアルエディター」に戻す。クラシックエディタなら「テキスト」タブに貼る
 5. 事実（金額・時間数・条件）は出典を確認してから書く。不確かなものは「※最新は公式サイトで確認」と添える
