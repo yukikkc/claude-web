@@ -56,6 +56,29 @@ description: ブログ「Live Freely」（live-freely-22.com）の記事を執�
 
 1. トピックについて最新情報をリサーチする（制度・お金系は公式サイトの情報を優先し、年度・金額・条件を確認する）
 2. `articles/` ディレクトリに `articles/<slug>.md` として保存する（slugは英語ケバブケース）
-3. 冒頭にタイトル（H1）、その下に本文。WordPressに貼りやすいMarkdownで書く
-4. 事実（金額・時間数・条件）は出典を確認してから書く。不確かなものは「※最新は公式サイトで確認」と添える
-5. 固有名詞（サービス名・制度名）は正式名称で書く
+3. 冒頭にタイトル（H1）、その下に本文
+4. **必ずWordPress貼り付け用のHTML版 `articles/<slug>.html` も同時に作る**（ブログはWordPressで、Markdownをそのまま貼ると `#` や `**` が記号のまま残ってしまうため）
+   - 使うタグは `<h2>` `<h3>` `<p>` `<strong>` `<ul>` `<ol>` `<li>` `<table>` `<blockquote>` `<a>` `<small>` のみ。`<h1>` は使わない
+   - タイトルはWordPressのタイトル欄に貼る用として、ファイル先頭にHTMLコメントで置く
+   - 貼り方：ブロックエディタなら右上「︙」→「コードエディター」に貼ってから「ビジュアルエディター」に戻す。クラシックエディタなら「テキスト」タブに貼る
+5. 事実（金額・時間数・条件）は出典を確認してから書く。不確かなものは「※最新は公式サイトで確認」と添える
+6. 固有名詞（サービス名・制度名）は正式名称で書く
+
+## WordPressへの下書き投稿（環境変数が設定済みの場合）
+
+環境変数 `WP_URL` / `WP_USER` / `WP_APP_PASSWORD` が設定されている場合は、記事完成後にREST APIで下書きとして直接登録する：
+
+```bash
+# HTML本文をJSONに詰めて下書き投稿（statusは必ず draft。勝手に公開しない）
+jq -n --arg title "記事タイトル" --rawfile content articles/<slug>.html \
+  '{title:$title, content:$content, status:"draft"}' \
+| curl -sS -u "$WP_USER:$WP_APP_PASSWORD" \
+    -X POST "$WP_URL/wp-json/wp/v2/posts" \
+    -H "Content-Type: application/json" -d @- \
+| jq '{id, status, link}'
+```
+
+- 投稿HTMLの先頭のタイトル用コメント（`<!-- ▼タイトル欄に貼る用 -->`）は本文から除いてから送る
+- **status は必ず `draft`**。公開（publish）はユーザーが管理画面で行う
+- 認証エラー（401）ならアプリケーションパスワードの再確認、403ならサーバーのWAF/bot対策が原因の可能性が高いので、ユーザーに報告する
+- 環境変数が未設定の場合は投稿せず、`.md` と `.html` を成果物として渡す
