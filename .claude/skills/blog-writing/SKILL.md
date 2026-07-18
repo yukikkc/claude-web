@@ -55,15 +55,20 @@ description: ブログ「Live Freely」（live-freely-22.com）の記事を執�
 ## 執筆ワークフロー
 
 1. トピックについて最新情報をリサーチする（制度・お金系は公式サイトの情報を優先し、年度・金額・条件を確認する）
-2. `articles/` ディレクトリに `articles/<slug>.md` として保存する（slugは英語ケバブケース）
-3. 冒頭にタイトル（H1）、その下に本文
-4. **必ずWordPress貼り付け用のHTML版 `articles/<slug>.html` も同時に作る**（ブログはWordPressで、Markdownをそのまま貼ると `#` や `**` が記号のまま残ってしまうため）
-   - 使うタグは `<h2>` `<h3>` `<p>` `<strong>` `<ul>` `<ol>` `<li>` `<table>` `<blockquote>` `<a>` `<small>` のみ。`<h1>` は使わない
-   - **テーマはSWELL**。装飾したいリストはGutenbergブロックコメント付きで書くと、貼り付け時にSWELLのネイティブブロックになる：
-     `<!-- wp:list {"className":"is-style-check_list"} --><ul class="wp-block-list is-style-check_list">` ＋ 各`<li>`を`<!-- wp:list-item -->`〜`<!-- /wp:list-item -->`で包み、`</ul>`の後に`<!-- /wp:list -->`
-     SWELLのリストスタイル: `is-style-check_list`（チェック）/ `is-style-good_list` / `is-style-bad_list` / `is-style-num_circle`（丸数字）/ `is-style-index`（目次風）。注意点リストにはcheck_listを使う
-   - タイトルはWordPressのタイトル欄に貼る用として、ファイル先頭にHTMLコメントで置く
-   - 貼り方：ブロックエディタなら右上「︙」→「コードエディター」に貼ってから「ビジュアルエディター」に戻す。クラシックエディタなら「テキスト」タブに貼る
+2. **主成果物は `articles/<slug>.html`（Gutenbergブロック形式）**。Markdown版は作らない（頼まれたときだけ）。slugは英語ケバブケース
+3. **ブログはWordPress＋テーマSWELL。本文の全要素をGutenbergブロックコメント付きで書く**。これでコードエディターに貼った瞬間、すべてが編集可能なネイティブブロックになる：
+   - 段落: `<!-- wp:paragraph --><p>…</p><!-- /wp:paragraph -->`
+   - 見出し: `<!-- wp:heading --><h2 class="wp-block-heading">…</h2><!-- /wp:heading -->`（H3は `{"level":3}`。`<h1>`は使わない）
+   - リスト: `<!-- wp:list --><ul class="wp-block-list">` ＋ 各`<li>`を`<!-- wp:list-item -->`〜`<!-- /wp:list-item -->`で包む。番号付きは `{"ordered":true}` で`<ol>`
+   - 表: `<!-- wp:table --><figure class="wp-block-table"><table class="has-fixed-layout">…</table></figure><!-- /wp:table -->`
+   - 引用: `<!-- wp:quote --><blockquote class="wp-block-quote">`（中の段落もwp:paragraphで包む）
+   - 小さい文字（免責など）: `<!-- wp:paragraph {"fontSize":"small"} --><p class="has-small-font-size">…</p>`（`<small>`タグは使わない）
+   - **SWELLのリストスタイル**はclassNameで指定: `is-style-check_list`（チェック・注意点リスト向け）/ `is-style-good_list` / `is-style-bad_list` / `is-style-num_circle` / `is-style-index`
+     例: `<!-- wp:list {"className":"is-style-check_list"} --><ul class="wp-block-list is-style-check_list">`
+   - **SWELL専用ブロック（ふきだし・キャプションボックス・FAQ・ステップ等）はHTMLで生成しない**（バージョンによりマークアップが変わり壊れやすいため）。代わりに、置き換えると映える箇所を納品時にユーザーへ提案する
+   - 画像を入れたい位置には目印の段落 `<p>【📷 ここに◯◯の画像を挿入（この段落は画像に差し替えて削除）】</p>` を置く
+   - 記事タイトルはWordPressのタイトル欄に貼る用として、ファイル先頭にHTMLコメントで置く
+   - 貼り方：ブロックエディタ右上「︙」→「コードエディター」に貼って「ビジュアルエディター」に戻す
 5. 事実（金額・時間数・条件）は出典を確認してから書く。不確かなものは「※最新は公式サイトで確認」と添える
 6. 固有名詞（サービス名・制度名）は正式名称で書く
 7. **頻度・割合の表現ルール**：「多い」「ほとんど」「一般的」などの頻度表現は、実際に全体を調べて8割以上を確認できた場合のみ使う。未検証なら「〜もある」「〜な場合がある」に留める。検証済みの数字があるなら「4社中3社」のように具体的に書く
