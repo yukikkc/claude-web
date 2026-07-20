@@ -75,19 +75,25 @@ description: ブログ「Live Freely」（live-freely-22.com）の記事を執�
 
 ## WordPressへの下書き投稿（環境変数が設定済みの場合）
 
-環境変数 `WP_URL` / `WP_USER` / `WP_APP_PASSWORD` が設定されている場合は、記事完成後にREST APIで下書きとして直接登録する：
+環境変数 `WP_URL` / `WP_USER` / `WP_APP_PASSWORD` が設定されている場合は、記事完成後にREST APIで下書きとして直接登録する。
+
+**重要：このブログはエックスサーバー上にあり、`/wp-json/` パスは国外IP制限で403になる。必ず `?rest_route=` 形式のエンドポイントを使うこと**（WordPress標準の代替ルートで機能は同一）：
 
 ```bash
+# 認証確認（roles に contributor が出ればOK）
+curl -sS -u "$WP_USER:$WP_APP_PASSWORD" "$WP_URL/?rest_route=/wp/v2/users/me&context=edit"
+
 # HTML本文をJSONに詰めて下書き投稿（statusは必ず draft。勝手に公開しない）
 jq -n --arg title "記事タイトル" --rawfile content articles/<slug>.html \
   '{title:$title, content:$content, status:"draft"}' \
 | curl -sS -u "$WP_USER:$WP_APP_PASSWORD" \
-    -X POST "$WP_URL/wp-json/wp/v2/posts" \
+    -X POST "$WP_URL/?rest_route=/wp/v2/posts" \
     -H "Content-Type: application/json" -d @- \
 | jq '{id, status, link}'
 ```
 
 - 投稿HTMLの先頭のタイトル用コメント（`<!-- ▼タイトル欄に貼る用 -->`）は本文から除いてから送る
 - **status は必ず `draft`**。公開（publish）はユーザーが管理画面で行う
-- 認証エラー（401）ならアプリケーションパスワードの再確認、403ならサーバーのWAF/bot対策が原因の可能性が高いので、ユーザーに報告する
-- 環境変数が未設定の場合は投稿せず、`.md` と `.html` を成果物として渡す
+- `WP_APP_PASSWORD` はアプリケーションパスワード（英数字24文字・スペース除去済み）。12文字前後で記号入りならログインパスワードが誤設定されている → ユーザーに再発行を依頼
+- 認証エラー（`rest_not_logged_in`）ならパスワード形式を確認。403ならエックスサーバーの「国外アクセス制限 > REST API アクセス制限」がONに戻っていないか確認を依頼
+- 環境変数が未設定の場合は投稿せず、`.html` を成果物として渡す
